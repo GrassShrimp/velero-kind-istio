@@ -8,14 +8,16 @@ resource "null_resource" "download_istio" {
     command = "rm -r ${path.module}/istio-1.11.2"
   }
 
-  depends_on = [kind_cluster.k8s-cluster]
+  depends_on = [
+    helm_release.metallb
+  ]
 }
 
 resource "kubernetes_namespace" "istio-operator" {
   metadata {
     annotations = {
-      name = "istio-operator"
-      "meta.helm.sh/release-name" = "istio-operator"
+      name                             = "istio-operator"
+      "meta.helm.sh/release-name"      = "istio-operator"
       "meta.helm.sh/release-namespace" = "istio-operator"
     }
 
@@ -29,11 +31,11 @@ resource "kubernetes_namespace" "istio-operator" {
 }
 
 resource "helm_release" "istio-operator" {
-  name       = "istio-operator"
-  repository = "${path.module}/istio-1.11.2/manifests/charts"
-  chart = "istio-operator"
-  version = "1.11.2"
-  namespace = kubernetes_namespace.istio-operator.metadata[0].name
+  name            = "istio-operator"
+  repository      = "${path.module}/istio-1.11.2/manifests/charts"
+  chart           = "istio-operator"
+  version         = "1.11.2"
+  namespace       = kubernetes_namespace.istio-operator.metadata[0].name
   cleanup_on_fail = true
 }
 

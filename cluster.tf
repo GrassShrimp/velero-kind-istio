@@ -1,6 +1,6 @@
 resource "kind_cluster" "k8s-cluster" {
-  name = "k8s-cluster"
-  image = "kindest/node:v1.22.1"
+  name   = "k8s-cluster"
+  image  = "kindest/node:v1.22.1"
   config = <<-EOF
     kind: Cluster
     apiVersion: kind.x-k8s.io/v1alpha4

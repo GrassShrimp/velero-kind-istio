@@ -1,23 +1,23 @@
 terraform {
   required_providers {
     kind = {
-      source = "justenwalker/kind"
+      source  = "justenwalker/kind"
       version = "0.11.0-rc.1"
     }
     kubernetes = {
-      source = "hashicorp/kubernetes"
+      source  = "hashicorp/kubernetes"
       version = "2.5.0"
     }
     helm = {
-      source = "hashicorp/helm"
+      source  = "hashicorp/helm"
       version = "2.3.0"
     }
     external = {
-      source = "hashicorp/external"
+      source  = "hashicorp/external"
       version = "2.1.0"
     }
     null = {
-      source = "hashicorp/null"
+      source  = "hashicorp/null"
       version = "3.1.0"
     }
   }
@@ -25,7 +25,7 @@ terraform {
 
 provider "kubernetes" {
   config_context = kind_cluster.k8s-cluster.context
-  config_path = "~/.kube/config"
+  config_path    = "~/.kube/config"
   experiments {
     manifest_resource = true
   }
@@ -34,6 +34,6 @@ provider "kubernetes" {
 provider "helm" {
   kubernetes {
     config_context = kind_cluster.k8s-cluster.context
-    config_path = "~/.kube/config"
+    config_path    = "~/.kube/config"
   }
 }
