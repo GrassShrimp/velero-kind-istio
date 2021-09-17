@@ -48,16 +48,8 @@ resource "kubernetes_namespace" "istio-system" {
   depends_on = [helm_release.istio-operator]
 }
 
-resource "kubernetes_manifest" "istio-operator" {
-  manifest = yamldecode(
-  <<-EOF
-  apiVersion: install.istio.io/v1alpha1
-  kind: IstioOperator
-  metadata:
-    namespace: istio-system
-    name: istiocontrolplane
-  spec:
-    profile: demo
-  EOF
-  )
+resource "null_resource" "installing-istio" {
+  provisioner "local-exec" {
+    command = "kubectl apply -f ./istio-profile.yaml -n ${kubernetes_namespace.istio-system.metadata[0].name}"
+  }
 }

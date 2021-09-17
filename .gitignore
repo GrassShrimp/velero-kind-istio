@@ -1,3 +1,4 @@
 istio-*
 .terraform
 terraform.tfstate*
+!istio-profile.yaml
