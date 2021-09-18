@@ -2,3 +2,4 @@ istio-*
 .terraform
 terraform.tfstate*
 !istio-profile.yaml
+*_values.yaml
