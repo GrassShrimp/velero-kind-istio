@@ -52,6 +52,6 @@ resource "kubernetes_namespace" "istio-system" {
 
 resource "null_resource" "installing-istio" {
   provisioner "local-exec" {
-    command = "kubectl apply -f ./istio-profile.yaml -n ${kubernetes_namespace.istio-system.metadata[0].name}"
+    command = "kubectl apply -f ${path.root}/configs/istio-profile.yaml -n ${kubernetes_namespace.istio-system.metadata[0].name}"
   }
 }

@@ -20,15 +20,16 @@ terraform {
       source  = "hashicorp/null"
       version = "3.1.0"
     }
+    random = {
+      source = "hashicorp/random"
+      version = "3.1.0"
+    }
   }
 }
 
 provider "kubernetes" {
   config_context = kind_cluster.k8s-cluster.context
   config_path    = "~/.kube/config"
-  experiments {
-    manifest_resource = true
-  }
 }
 
 provider "helm" {
