@@ -11,7 +11,7 @@ resource "kubernetes_persistent_volume" "minio" {
     access_modes = ["ReadWriteOnce"]
     persistent_volume_source {
       local {
-        path = "/mnt/disks/pv1"
+        path = "/mnt/disks/minio"
       }
     }
     storage_class_name = "standard"

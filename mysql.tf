@@ -72,15 +72,14 @@ resource "kubernetes_stateful_set" "mysql" {
         volume {
           name = "data"
           persistent_volume_claim {
-            claim_name = kubernetes_persistent_volume_claim.mysql.metadata[0].name
+            claim_name = "mysql"
           }
         }
       }
     }
     volume_claim_template {
       metadata {
-        name      = "mysql"
-        namespace = kubernetes_namespace.mysql.metadata[0].name
+        name = "mysql"
       }
       spec {
         access_modes = ["ReadWriteOnce"]

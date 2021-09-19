@@ -20,6 +20,12 @@ resource "kind_cluster" "k8s-cluster" {
         hostPort: 443
         protocol: TCP
     - role: worker
+      extraMounts:
+      - hostPath: /tmp/mnt_worker1/
+        containerPath: /mnt/disks
     - role: worker
+      extraMounts:
+      - hostPath: /tmp/mnt_worker2/
+        containerPath: /mnt/disks
   EOF
 }
