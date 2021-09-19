@@ -27,7 +27,7 @@ resource "kubernetes_stateful_set" "mysql" {
       spec {
         container {
           name              = "mysql"
-          image             = "mysql:8.0.26"
+          image             = "mysql:5.6"
           image_pull_policy = "IfNotPresent"
           port {
             container_port = 3306
@@ -66,20 +66,13 @@ resource "kubernetes_stateful_set" "mysql" {
           volume_mount {
             name       = "data"
             mount_path = "/var/lib/mysql"
-            sub_path   = "mysql"
-          }
-        }
-        volume {
-          name = "data"
-          persistent_volume_claim {
-            claim_name = "mysql"
           }
         }
       }
     }
     volume_claim_template {
       metadata {
-        name = "mysql"
+        name = "data"
       }
       spec {
         access_modes = ["ReadWriteOnce"]
