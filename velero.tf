@@ -31,6 +31,7 @@ resource "helm_release" "velero" {
         aws_access_key_id=${var.minioAccessKey}
         aws_secret_access_key=${var.minioSecretKey}
   deployRestic: true
+  cleanUpCRDs: true
   EOF
   ]
   depends_on = [

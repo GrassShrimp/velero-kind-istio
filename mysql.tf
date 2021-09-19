@@ -2,10 +2,13 @@ resource "kubernetes_namespace" "mysql" {
   metadata {
     name = "mysql"
   }
+  depends_on = [
+    helm_release.velero
+  ]
 }
 resource "kubernetes_stateful_set" "mysql" {
   metadata {
-    name = "mysql"
+    name      = "mysql"
     namespace = kubernetes_namespace.mysql.metadata[0].name
   }
   spec {
@@ -24,7 +27,7 @@ resource "kubernetes_stateful_set" "mysql" {
       spec {
         container {
           name              = "mysql"
-          image             = "mysql:5.7.35"
+          image             = "mysql:8.0.26"
           image_pull_policy = "IfNotPresent"
           port {
             container_port = 3306
@@ -69,30 +72,31 @@ resource "kubernetes_stateful_set" "mysql" {
         volume {
           name = "data"
           persistent_volume_claim {
-            claim_name = "data"
+            claim_name = kubernetes_persistent_volume_claim.mysql.metadata[0].name
           }
         }
       }
     }
     volume_claim_template {
       metadata {
-        name = "data"
+        name      = "mysql"
+        namespace = kubernetes_namespace.mysql.metadata[0].name
       }
       spec {
+        access_modes = ["ReadWriteOnce"]
         resources {
           requests = {
-            "storage" = "10Gi"
+            storage = "10Gi"
           }
         }
-        access_modes       = ["ReadWriteOnce"]
-        storage_class_name = "standard" 
+        storage_class_name = "standard"
       }
     }
   }
 }
 resource "kubernetes_service" "mysql" {
   metadata {
-    name = "mysql"
+    name      = "mysql"
     namespace = kubernetes_namespace.mysql.metadata[0].name
   }
   spec {

@@ -1,6 +1,34 @@
 resource "random_uuid" "minio" {
 }
-
+resource "kubernetes_persistent_volume" "minio" {
+  metadata {
+    name = "minio"
+  }
+  spec {
+    capacity = {
+      storage = "10Gi"
+    }
+    access_modes = ["ReadWriteOnce"]
+    persistent_volume_source {
+      local {
+        path = "/mnt/disks/pv1"
+      }
+    }
+    storage_class_name = "standard"
+    node_affinity {
+      required {
+        node_selector_term {
+          match_expressions {
+            key = "kubernetes.io/hostname"
+            operator = "NotIn"
+            values = ["k8s-cluster-control-plane"]
+          }
+        }
+      }
+    }
+    persistent_volume_reclaim_policy = "Delete"
+  }
+}
 resource "helm_release" "minio" {
   name             = "minio"
   repository       = "https://helm.min.io/"
@@ -18,10 +46,12 @@ resource "helm_release" "minio" {
   gcsgateway:
     enabled: true
     replicas: 1
-    gcsKeyJson: '${replace(file("${path.root}/.keys/pinjyun-8d9c080ae4d3.json"), "\n", "")}'
+    gcsKeyJson: '${replace(file("${path.root}/.keys/gcs_key.json"), "\n", "")}'
     projectId: "pinjyun"
   persistence:
-    enabled: false
+    enabled: true
+    VolumeName: ${kubernetes_persistent_volume.minio.metadata[0].name}
+    size: 10Gi
   EOF
   ]
   depends_on = [
