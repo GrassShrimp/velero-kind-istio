@@ -28,13 +28,44 @@ resource "helm_release" "minio" {
     null_resource.installing-istio
   ]
 }
+resource "local_file" "minio-ingress" {
+  content = <<-EOF
+  apiVersion: networking.istio.io/v1alpha3
+  kind: Gateway
+  metadata:
+    name: minio
+  spec:
+    selector:
+      istio: ingressgateway
+    servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+      - "minio.pinjyun.local"
+  ---
+  apiVersion: networking.istio.io/v1alpha3
+  kind: VirtualService
+  metadata:
+    name: minio
+  spec:
+    hosts:
+    - "minio.pinjyun.local"
+    gateways:
+    - minio
+    http:
+    - route:
+      - destination:
+          port:
+            number: 9000
+          host: minio.minio.svc.cluster.local
+  EOF
+  filename = "${path.root}/configs/minio-ingress.yaml"
+}
 resource "null_resource" "minio-ingress" {
   provisioner "local-exec" {
-    command = "kubectl apply -f ${path.root}/configs/minio-ingress.yaml -n minio"
-  }
-  provisioner "local-exec" {
-    when = destroy
-    command = "kubectl delete -f ${path.root}/configs/minio-ingress.yaml -n minio"
+    command = "kubectl apply -f ${local_file.minio-ingress.filename} -n minio"
   }
   depends_on = [
     helm_release.minio

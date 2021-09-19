@@ -18,13 +18,11 @@ resource "helm_release" "velero" {
     backupStorageLocation:
       bucket: velero-${random_uuid.minio.result}
       config:
-        region: default
+        region: minio
         s3ForcePathStyle: true
         publicUrl: http://minio.pinjyun.local
         s3Url: http://minio.minio.svc.cluster.local:9000
-    volumeSnapshotLocation:
-      config:
-        region: default
+    defaultVolumesToRestic: true
   credentials:
     name: velero
     secretContents:
@@ -32,6 +30,7 @@ resource "helm_release" "velero" {
         [default]
         aws_access_key_id=${var.minioAccessKey}
         aws_secret_access_key=${var.minioSecretKey}
+  deployRestic: true
   EOF
   ]
   depends_on = [

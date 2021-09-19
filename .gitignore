@@ -4,3 +4,4 @@ terraform.tfstate*
 !istio-profile.yaml
 *_values.yaml
 .keys
+configs
