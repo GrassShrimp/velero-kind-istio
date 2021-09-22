@@ -52,6 +52,9 @@ resource "helm_release" "minio" {
     enabled: true
     VolumeName: ${kubernetes_persistent_volume.minio.metadata[0].name}
     size: 10Gi
+  resources:
+    requests:
+      memory: 2Gi
   EOF
   ]
   depends_on = [
@@ -73,7 +76,7 @@ resource "local_file" "minio-ingress" {
         name: http
         protocol: HTTP
       hosts:
-      - "minio.pinjyun.local"
+      - "minio.pinjyun.work"
   ---
   apiVersion: networking.istio.io/v1alpha3
   kind: VirtualService
@@ -81,7 +84,7 @@ resource "local_file" "minio-ingress" {
     name: minio
   spec:
     hosts:
-    - "minio.pinjyun.local"
+    - "minio.pinjyun.work"
     gateways:
     - minio
     http:
@@ -94,10 +97,15 @@ resource "local_file" "minio-ingress" {
   filename = "${path.root}/configs/minio-ingress.yaml"
 }
 resource "null_resource" "minio-ingress" {
+  triggers = {
+    always_run = timestamp()
+  }
+
   provisioner "local-exec" {
     command = "kubectl apply -f ${local_file.minio-ingress.filename} -n minio"
   }
   depends_on = [
-    helm_release.minio
+    helm_release.minio,
+    local_file.minio-ingress
   ]
 }

@@ -101,7 +101,14 @@ resource "local_file" "istio-profile" {
   filename = "${path.root}/configs/istio-profile.yaml"
 }
 resource "null_resource" "installing-istio" {
+  triggers = {
+    always_run = timestamp()
+  }
+
   provisioner "local-exec" {
     command = "kubectl apply -f ${local_file.istio-profile.filename} -n ${kubernetes_namespace.istio-system.metadata[0].name}"
   }
+  depends_on = [
+    local_file.istio-profile
+  ]
 }

@@ -17,8 +17,8 @@ resource "helm_release" "metallb" {
     - name: default
       protocol: layer2
       addresses:
-      # - ${cidrhost(data.external.subnet.result.Subnet, 150)}-${cidrhost(data.external.subnet.result.Subnet, 200)}
-      - 127.0.0.1 - 127.0.0.1
+      - ${cidrhost(data.external.subnet.result.Subnet, 150)}-${cidrhost(data.external.subnet.result.Subnet, 200)}
+      # - 127.0.0.1 - 127.0.0.1
   EOF
   ]
 

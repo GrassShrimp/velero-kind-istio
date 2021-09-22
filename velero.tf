@@ -20,7 +20,7 @@ resource "helm_release" "velero" {
       config:
         region: minio
         s3ForcePathStyle: true
-        publicUrl: http://minio.pinjyun.local
+        publicUrl: http://minio.pinjyun.work
         s3Url: http://minio.minio.svc.cluster.local:9000
     defaultVolumesToRestic: true
   credentials:
