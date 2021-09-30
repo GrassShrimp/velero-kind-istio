@@ -32,13 +32,13 @@ terraform {
 }
 
 provider "kubernetes" {
-  config_context = kind_cluster.k8s-cluster.context
+  config_context = module.k8s-cluster.config_context
   config_path    = "~/.kube/config"
 }
 
 provider "helm" {
   kubernetes {
-    config_context = kind_cluster.k8s-cluster.context
+    config_context = module.k8s-cluster.config_context
     config_path    = "~/.kube/config"
   }
 }

@@ -58,7 +58,7 @@ resource "helm_release" "minio" {
   EOF
   ]
   depends_on = [
-    null_resource.installing-istio
+    module.k8s-cluster
   ]
 }
 resource "local_file" "minio-ingress" {
