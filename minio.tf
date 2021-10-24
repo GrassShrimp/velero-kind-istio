@@ -28,12 +28,15 @@ resource "kubernetes_persistent_volume" "minio" {
     }
     persistent_volume_reclaim_policy = "Delete"
   }
+  depends_on = [
+    kind_cluster.k8s-cluster
+  ]
 }
 resource "helm_release" "minio" {
   name             = "minio"
   repository       = "https://helm.min.io/"
   chart            = "minio"
-  version          = "8.0.10"
+  version          = var.MINIO_VERSION
   namespace        = "minio"
   create_namespace = true
   values = [
@@ -47,7 +50,7 @@ resource "helm_release" "minio" {
     enabled: true
     replicas: 1
     gcsKeyJson: '${replace(file("${path.root}/.keys/gcs_key.json"), "\n", "")}'
-    projectId: "pinjyun"
+    projectId: ${var.PROJECT_ID}
   persistence:
     enabled: true
     VolumeName: ${kubernetes_persistent_volume.minio.metadata[0].name}
@@ -56,9 +59,6 @@ resource "helm_release" "minio" {
     requests:
       memory: 2Gi
   EOF
-  ]
-  depends_on = [
-    module.k8s-cluster
   ]
 }
 resource "local_file" "minio-ingress" {
@@ -76,7 +76,7 @@ resource "local_file" "minio-ingress" {
         name: http
         protocol: HTTP
       hosts:
-      - "minio.pinjyun.work"
+      - "minio.pinjyun.local"
   ---
   apiVersion: networking.istio.io/v1alpha3
   kind: VirtualService
@@ -84,7 +84,7 @@ resource "local_file" "minio-ingress" {
     name: minio
   spec:
     hosts:
-    - "minio.pinjyun.work"
+    - "minio.pinjyun.local"
     gateways:
     - minio
     http:
@@ -95,16 +95,11 @@ resource "local_file" "minio-ingress" {
           host: minio.minio.svc.cluster.local
   EOF
   filename = "${path.root}/configs/minio-ingress.yaml"
-}
-resource "null_resource" "minio-ingress" {
-  triggers = {
-    always_run = timestamp()
-  }
-
   provisioner "local-exec" {
-    command = "kubectl apply -f ${local_file.minio-ingress.filename} -n minio"
+    command = "kubectl apply -f ${self.filename} -n ${helm_release.minio.namespace}"
   }
   depends_on = [
+    time_sleep.wait_istio_ready,
     helm_release.minio,
     local_file.minio-ingress
   ]

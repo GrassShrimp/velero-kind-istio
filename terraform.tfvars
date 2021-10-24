@@ -1,2 +1,8 @@
 minioAccessKey = "minio"
 minioSecretKey = "minio123"
+PROJECT_ID = "pinjyun"
+MINIO_VERSION = "8.0.10"
+VELERO_VERSION = "2.24.0"
+KIND_VERSION = "1.22.1"
+METALLB_VERSION = "0.10.3"
+ISTIO_VERSION = "1.11.2"
