@@ -76,7 +76,7 @@ resource "local_file" "minio-ingress" {
         name: http
         protocol: HTTP
       hosts:
-      - "minio.pinjyun.local"
+      - "minio.${data.kubernetes_service.istio-ingressgateway.status.0.load_balancer.0.ingress.0.ip}.nip.io"
   ---
   apiVersion: networking.istio.io/v1alpha3
   kind: VirtualService
@@ -84,7 +84,7 @@ resource "local_file" "minio-ingress" {
     name: minio
   spec:
     hosts:
-    - "minio.pinjyun.local"
+    - "minio.${data.kubernetes_service.istio-ingressgateway.status.0.load_balancer.0.ingress.0.ip}.nip.io"
     gateways:
     - minio
     http:
