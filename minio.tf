@@ -29,7 +29,7 @@ resource "kubernetes_persistent_volume" "minio" {
     persistent_volume_reclaim_policy = "Delete"
   }
   depends_on = [
-    kind_cluster.k8s-cluster
+    module.kind-istio-metallb
   ]
 }
 resource "helm_release" "minio" {
@@ -76,7 +76,7 @@ resource "local_file" "minio-ingress" {
         name: http
         protocol: HTTP
       hosts:
-      - "minio.${data.kubernetes_service.istio-ingressgateway.status.0.load_balancer.0.ingress.0.ip}.nip.io"
+      - "minio.${module.kind-istio-metallb.ingress_ip_address}.nip.io"
   ---
   apiVersion: networking.istio.io/v1alpha3
   kind: VirtualService
@@ -84,7 +84,7 @@ resource "local_file" "minio-ingress" {
     name: minio
   spec:
     hosts:
-    - "minio.${data.kubernetes_service.istio-ingressgateway.status.0.load_balancer.0.ingress.0.ip}.nip.io"
+    - "minio.${module.kind-istio-metallb.ingress_ip_address}.nip.io"
     gateways:
     - minio
     http:
@@ -99,7 +99,7 @@ resource "local_file" "minio-ingress" {
     command = "kubectl apply -f ${self.filename} -n ${helm_release.minio.namespace}"
   }
   depends_on = [
-    time_sleep.wait_istio_ready,
+    module.kind-istio-metallb,
     helm_release.minio,
     local_file.minio-ingress
   ]

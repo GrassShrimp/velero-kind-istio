@@ -20,7 +20,7 @@ resource "helm_release" "velero" {
       config:
         region: minio
         s3ForcePathStyle: true
-        publicUrl: http://minio.${data.kubernetes_service.istio-ingressgateway.status.0.load_balancer.0.ingress.0.ip}.nip.io
+        publicUrl: http://minio.${module.kind-istio-metallb.ingress_ip_address}.nip.io
         s3Url: http://minio.minio.svc.cluster.local:9000
     defaultVolumesToRestic: true
   credentials:
